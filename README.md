@@ -1,4 +1,4 @@
-# cURL healthchecker
+# cURL healthchecker [![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/eexit/curl-healthchecker?style=flat-square)](https://hub.docker.com/repository/docker/eexit/curl-healthchecker)
 
 Latelely, I'm trying to set-up `HEALTHCHECK` to my Docker images and since I have many Go projects that run from scratch, I needed to find a way to test the health of my Go APIs.
 
@@ -26,8 +26,8 @@ But even after compression (using [upx](https://upx.github.io/)), the binary is 
 
 After some digging and testing, I managed to build my own cURL binary with the bare mininum to handle a basic HTTP healthcheck request:
 
-```
-docker run --rm eexit/curl-healthchecker:v1.0.0 -V
+```bash
+$ docker run --rm eexit/curl-healthchecker:v1.0.0 -V
 curl 7.77.0 (x86_64-pc-linux-musl) libcurl/7.77.0
 Release-Date: 2021-05-26
 Protocols: http
@@ -40,7 +40,7 @@ The binary size is 194K, which is pretty slim.
 
 You only need to add 3 lines in your Dockerfile:
 
-```docke
+```dockerfile
 FROM eexit/curl-healthchecker:v1.0.0 AS curl
 # Other stages...
 
@@ -49,7 +49,7 @@ COPY --from=curl /curl /
 # Copy from other stages...
 
 # Supposed your healthcheck endpoint is http://127.0.0.1/healthcheck
-HEALTHCHECK --interval=15s --timeout=2s --retries=3 \
+HEALTHCHECK --interval=5s --timeout=2s --retries=3 \
     CMD ["/curl", "-fIA", "cURL healthcheck", "http://127.0.0.1/healthcheck"]
 ```
 
